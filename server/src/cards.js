@@ -1,7 +1,7 @@
 const FRUITS = [
   { id: 'banana', name: '바나나', emoji: '🍌' },
   { id: 'strawberry', name: '딸기', emoji: '🍓' },
-  { id: 'lime', name: '라임', emoji: '🍋‍🟢' },
+  { id: 'lime', name: '라임', emoji: '🍋' },
   { id: 'grape', name: '포도(자두)', emoji: '🍇' },
 ];
 
