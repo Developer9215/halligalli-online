@@ -14,11 +14,18 @@ class HalliGalliRoom {
     this.phase = 'lobby';
     this.players = [];
     this.hostId = null;
+    this.mode = 'online';
+    this.bellMode = 'button';
     this.turnIndex = 0;
     this.revealGen = 0;
     this.winner = null;
     this.lastResolution = null;
     this.log = [];
+  }
+
+  setMode(mode, bellMode) {
+    this.mode = mode === 'offline' ? 'offline' : 'online';
+    this.bellMode = this.mode === 'offline' && bellMode === 'physical' ? 'physical' : 'button';
   }
 
   addLog(message) {
@@ -114,10 +121,16 @@ class HalliGalliRoom {
       });
   }
 
-  ring(playerId, clientRevealGen) {
+  ring(submitterId, clientRevealGen, claimedRingerId) {
     if (this.phase !== 'playing') throw new Error('지금은 종을 칠 수 없습니다.');
+    if (!this.findPlayer(submitterId)) throw new Error('플레이어를 찾을 수 없습니다.');
+
+    // In offline + physical-bell rooms, the app can't hear the real bell, so anyone can
+    // report who actually struck it. In every other mode you can only ring for yourself.
+    const usePhysicalClaim = this.mode === 'offline' && this.bellMode === 'physical' && claimedRingerId;
+    const playerId = usePhysicalClaim ? claimedRingerId : submitterId;
     const ringer = this.findPlayer(playerId);
-    if (!ringer) throw new Error('플레이어를 찾을 수 없습니다.');
+    if (!ringer) throw new Error('존재하지 않는 플레이어입니다.');
 
     if (clientRevealGen !== this.revealGen) {
       this.lastResolution = { type: 'stale', playerId, ts: Date.now() };
@@ -175,6 +188,8 @@ class HalliGalliRoom {
       code: this.code,
       phase: this.phase,
       hostId: this.hostId,
+      mode: this.mode,
+      bellMode: this.bellMode,
       currentPlayerId: this.currentPlayerId(),
       revealGen: this.revealGen,
       deckSize: cards.DECK_SIZE,

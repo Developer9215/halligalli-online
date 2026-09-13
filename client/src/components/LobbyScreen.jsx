@@ -15,6 +15,12 @@ export default function LobbyScreen({ state }) {
       <div className="room-code-banner">
         방 코드 <span>{state.code}</span>
         <div className="hint">이 코드를 다른 사람에게 공유하세요 (2~8명)</div>
+        <div className="mode-badges">
+          <span className="mode-badge">{state.mode === 'offline' ? '👥 오프라인' : '📱 온라인'}</span>
+          {state.mode === 'offline' && (
+            <span className="mode-badge">{state.bellMode === 'physical' ? '🛎️ 실물 벨' : '🔘 버튼 벨'}</span>
+          )}
+        </div>
       </div>
 
       <h2>플레이어 ({n}/8)</h2>
@@ -31,7 +37,17 @@ export default function LobbyScreen({ state }) {
         <h3>규칙 요약</h3>
         <ul>
           <li>자기 차례가 되면 카드를 위로 스와이프해서 넘깁니다.</li>
-          <li>모두의 맨 위 카드를 합쳐 같은 과일이 정확히 5개가 되면, 누구든 🔔 버튼을 먼저 눌러야 합니다.</li>
+          {state.mode === 'offline' ? (
+            <li>내 폰엔 내가 넘긴 카드만 크게 보입니다. 다른 사람 카드는 그 사람 폰 화면을 직접 보고 확인하세요.</li>
+          ) : (
+            <li>모두의 카드가 내 화면에 함께 보입니다.</li>
+          )}
+          <li>모두의 맨 위 카드를 합쳐 같은 과일이 정확히 5개가 되면 종을 쳐야 합니다.</li>
+          {state.mode === 'offline' && state.bellMode === 'physical' ? (
+            <li>실물 벨을 먼저 친 사람이 누구인지 다 함께 확인한 뒤, 아무 폰에서나 그 사람 이름을 눌러 기록합니다.</li>
+          ) : (
+            <li>누구든(맞다고 생각하는 사람) 🔔 버튼을 가장 먼저 눌러야 합니다.</li>
+          )}
           <li>맞히면 테이블에 놓인 모든 카드를 가져가고, 틀리면 상대 전원에게 카드를 한 장씩 나눠줍니다.</li>
           <li>카드를 모두 모은 사람이 승리합니다.</li>
         </ul>

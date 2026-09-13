@@ -2,6 +2,8 @@ import { useState, useEffect, useRef } from 'react';
 import socket from '../socket.js';
 import PlayerTile from './PlayerTile.jsx';
 import SwipeCard from './SwipeCard.jsx';
+import OfflineCardStack from './OfflineCardStack.jsx';
+import PhysicalBellPanel from './PhysicalBellPanel.jsx';
 import GameLog from './GameLog.jsx';
 
 export default function GameScreen({ meta, state }) {
@@ -9,6 +11,7 @@ export default function GameScreen({ meta, state }) {
   const [toast, setToast] = useState(null);
   const [bellCooling, setBellCooling] = useState(false);
   const lastTsRef = useRef(0);
+  const myPlayer = state.players.find((p) => p.id === state.me.id);
 
   useEffect(() => {
     const r = state.lastResolution;
@@ -47,7 +50,7 @@ export default function GameScreen({ meta, state }) {
       {toast && <div className={`resolution-toast ${toast.kind}`}>{toast.text}</div>}
 
       <div className="tab-content">
-        {tab === 'play' && (
+        {tab === 'play' && state.mode === 'online' && (
           <div className="hg-play-tab">
             <div className="player-tile-grid">
               {state.players.map((p) => (
@@ -62,6 +65,21 @@ export default function GameScreen({ meta, state }) {
             </button>
           </div>
         )}
+
+        {tab === 'play' && state.mode === 'offline' && myPlayer && (
+          <div className="hg-play-tab offline">
+            <OfflineCardStack me={myPlayer} meta={meta} isMyTurn={state.me.isMyTurn && state.phase === 'playing'} onFlip={flip} />
+
+            {state.bellMode === 'button' ? (
+              <button className={`bell-btn ${bellCooling ? 'cooling' : ''}`} onPointerDown={ringBell} disabled={state.phase !== 'playing'}>
+                🔔
+              </button>
+            ) : (
+              <PhysicalBellPanel state={state} />
+            )}
+          </div>
+        )}
+
         {tab === 'log' && <GameLog log={state.log} />}
       </div>
 

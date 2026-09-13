@@ -22,9 +22,10 @@ function attach(io) {
   io.on('connection', (socket) => {
     socket.emit('meta:fruits', { fruits: cards.FRUITS, deckSize: cards.DECK_SIZE });
 
-    socket.on('room:create', ({ name }, ack) => {
+    socket.on('room:create', ({ name, mode, bellMode }, ack) => {
       withError(socket, () => {
         const room = store.create();
+        room.setMode(mode, bellMode);
         const player = room.addPlayer(name);
         player.socketId = socket.id;
         socketMeta.set(socket.id, { roomCode: room.code, playerId: player.id });
@@ -90,10 +91,10 @@ function attach(io) {
       });
     });
 
-    socket.on('game:ring', ({ revealGen }) => {
+    socket.on('game:ring', ({ revealGen, ringerId }) => {
       withError(socket, () => {
         const { room, playerId } = getCtx();
-        room.ring(playerId, revealGen);
+        room.ring(playerId, revealGen, ringerId);
         broadcastRoom(io, room);
       });
     });
