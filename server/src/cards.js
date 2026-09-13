@@ -2,14 +2,12 @@ const FRUITS = [
   { id: 'banana', name: '바나나', emoji: '🍌' },
   { id: 'strawberry', name: '딸기', emoji: '🍓' },
   { id: 'lime', name: '라임', emoji: '🍋‍🟢' },
-  { id: 'grape', name: '포도', emoji: '🍇' },
-  { id: 'apple', name: '사과', emoji: '🍎' },
+  { id: 'grape', name: '포도(자두)', emoji: '🍇' },
 ];
 
-// Custom balanced 60-card deck (not a pixel copy of the retail deck):
-// per fruit, counts 1-5 appear [3,3,2,2,2] times = 12 cards/fruit x 5 fruits = 60.
-// Lower counts are more common so 5-sums build up gradually across several flips.
-const COUNT_FREQUENCY = { 1: 3, 2: 3, 3: 2, 4: 2, 5: 2 };
+// Real Halli Galli base-game deck: 4 fruits x 14 cards = 56 cards total.
+// Per fruit, count-of-fruit-shown frequency: 1x5, 2x3, 3x3, 4x2, 5x1.
+const COUNT_FREQUENCY = { 1: 5, 2: 3, 3: 3, 4: 2, 5: 1 };
 const DECK_SIZE = FRUITS.length * Object.values(COUNT_FREQUENCY).reduce((a, b) => a + b, 0);
 
 function buildDeck() {
